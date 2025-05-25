@@ -1,8 +1,6 @@
 // frontend/src/App.jsx
 
 import React, { useState, useEffect, useCallback } from 'react';
-// react-router-dom 관련 임포트 완전히 제거 (이제 사용하지 않음)
-
 import SearchBar from './components/SearchBar';
 import MovieCard from './components/MovieCard';
 import MovieDetail from './components/MovieDetail';
