@@ -1,16 +1,8 @@
 // frontend/src/components/MovieDetail.jsx
 
 import React, { useState, useEffect } from 'react';
-// useParams, useNavigate 등 react-router-dom 임포트 제거 (App에서 라우터 제거했으니)
-// import { useParams } from 'react-router-dom';
 
-// fetchTmdbApi 임포트 제거 (App에서 받아옴)
-// import { fetchTmdbApi } from '../utils/api';
-
-// fetchApi prop을 받도록 변경
 function MovieDetail({ movieId, onBack, fetchApi }) { 
-  // movieId는 이제 prop으로 직접 전달됨
-  // const { movieId } = useParams(); // 제거
 
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);

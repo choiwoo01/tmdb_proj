@@ -1,10 +1,8 @@
 // frontend/src/components/FavoriteMovies.jsx
+
 import React, { useState, useEffect } from 'react';
-// Link 임포트 제거 (App에서 라우터 제거했으니)
-// import { Link } from 'react-router-dom';
 import MovieCard from './MovieCard';
-// fetchTmdbApi 임포트 제거 (App에서 받아옴)
-// import { fetchTmdbApi } from '../utils/api';
+
 
 // fetchApi prop을 받도록 변경
 function FavoriteMovies({ fetchApi }) {

@@ -19,7 +19,7 @@ function App() {
   const [currentView, setCurrentView] = useState('home'); // 'home', 'favorites', 'recent'
 
   // API 기본 경로 설정 - 이제 App.jsx에서 직접 관리
-  const API_BASE_PATH = 'https://backend-api-eta-jet.vercel.app/api';
+  const API_BASE_PATH = '/api';
 
   /**
    * TMDB API를 호출하는 범용 헬퍼 함수 (App.jsx 내부로 이동)
