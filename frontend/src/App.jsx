@@ -5,8 +5,8 @@ import SearchBar from './components/SearchBar';
 import MovieCard from './components/MovieCard';
 import MovieDetail from './components/MovieDetail';
 import FavoriteMovies from './components/FavoriteMovies'; // 찜 목록
-import RecentMovies from './components/RecentMovies';     // 최근 본 영화
-import MovieFilter from './components/MovieFilter';       // 고급 필터
+import RecentMovies from './components/RecentMovies';     // 최근 본 영화
+import MovieFilter from './components/MovieFilter';       // 고급 필터
 import './components/styles.css';
 
 function App() {
@@ -15,17 +15,10 @@ function App() {
   const [error, setError] = useState(null);
   const [selectedMovieId, setSelectedMovieId] = useState(null); // 영화 상세 페이지 표시 여부
   const [currentView, setCurrentView] = useState('home'); // 'home', 'favorites', 'recent'
+  const [lastHomeFilter, setLastHomeFilter] = useState({}); // 홈 뷰의 마지막 필터 상태 저장
 
-  // API 기본 경로 설정 - 이제 App.jsx에서 직접 관리
   const API_BASE_PATH = '/api';
 
-  /**
-   * TMDB API를 호출하는 범용 헬퍼 함수 (App.jsx 내부로 이동)
-   * @param {string} endpoint tmdb 뒤에 붙을 엔드포인트 (예: 'tmdb?type=popular')
-   * @param {object} options fetch API에 전달할 추가 옵션 (headers, method 등)
-   * @returns {Promise<any>} API 응답 데이터
-   * @throws {Error} API 호출 실패 시 에러 발생
-   */
   const fetchApi = useCallback(async (endpoint, options = {}) => {
     const url = `${API_BASE_PATH}/${endpoint}`;
 
@@ -45,9 +38,9 @@ function App() {
       console.error(`Error fetching from ${url}:`, error);
       throw error;
     }
-  }, [API_BASE_PATH]); // API_BASE_PATH가 변경될 일이 없으므로 안정적
+  }, [API_BASE_PATH]);
 
-  // 인기 영화 또는 필터링된 영화 불러오기
+  // 홈 뷰의 영화 목록을 불러오는 함수
   const fetchMovies = useCallback(async (filterParams = {}) => {
     setLoading(true);
     setError(null);
@@ -56,8 +49,9 @@ function App() {
         type: 'discover', // TMDB discover 엔드포인트 사용
         ...filterParams,
       }).toString();
-      const data = await fetchApi(`tmdb?${queryString}`); // App.jsx 내부 fetchApi 사용
+      const data = await fetchApi(`tmdb?${queryString}`);
       setMovies(data);
+      setLastHomeFilter(filterParams); // 마지막 필터 상태 저장
     } catch (err) {
       console.error("Error fetching movies:", err);
       setError(err.message);
@@ -66,22 +60,25 @@ function App() {
     }
   }, [fetchApi]);
 
+  // 초기 로드 시 인기 영화 불러오기 (home 뷰일 때만)
   useEffect(() => {
-    // 초기 로드 시 인기 영화 불러오기 (home 뷰일 때만)
-    if (currentView === 'home') {
-      fetchMovies();
+    if (currentView === 'home' && !selectedMovieId) {
+      // home으로 돌아왔을 때, 이전에 적용된 필터로 다시 로드
+      fetchMovies(lastHomeFilter); 
     }
-  }, [fetchMovies, currentView]);
+  }, [fetchMovies, currentView, selectedMovieId, lastHomeFilter]);
 
+  // 검색 처리
   const handleSearch = async (query) => {
     setCurrentView('home'); // 검색 시 홈 뷰로 전환
     setSelectedMovieId(null); // 상세 보기 해제
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchApi(`tmdb?type=search&query=${encodeURIComponent(query)}`); // App.jsx 내부 fetchApi 사용
+      const data = await fetchApi(`tmdb?type=search&query=${encodeURIComponent(query)}`);
       setMovies(data);
       localStorage.setItem('lastSearchQuery', query);
+      setLastHomeFilter({}); // 검색 시 필터 초기화
     } catch (err) {
       console.error("Error searching movies:", err);
       setError(err.message);
@@ -90,28 +87,30 @@ function App() {
     }
   };
 
+  // 영화 카드 클릭 시 상세 페이지로 이동
   const handleMovieClick = (id) => {
     setSelectedMovieId(id); // 선택된 영화 ID 설정하여 MovieDetail 렌더링
-    
-    // 최근 본 영화 저장 로직
-    const recent = JSON.parse(localStorage.getItem('recentMovies') || '[]');
-    let updatedRecent = recent.filter(item => item.id !== id); // 기존 항목 제거
-    updatedRecent.unshift({ id: id, timestamp: Date.now() }); // 맨 앞에 새 항목 추가
-
-    const MAX_RECENT_MOVIES = 10; // 최대 10개만 유지
-    if (updatedRecent.length > MAX_RECENT_MOVIES) {
-        updatedRecent = updatedRecent.slice(0, MAX_RECENT_MOVIES);
-    }
-    localStorage.setItem('recentMovies', JSON.stringify(updatedRecent));
   };
 
+  // 최근 본 영화 저장 로직 (selectedMovieId가 변경될 때만 실행)
+  useEffect(() => {
+    if (selectedMovieId) {
+      const recent = JSON.parse(localStorage.getItem('recentMovies') || '[]');
+      let updatedRecent = recent.filter(item => item.id !== selectedMovieId); // 기존 항목 제거
+      updatedRecent.unshift({ id: selectedMovieId, timestamp: Date.now() }); // 맨 앞에 새 항목 추가
+
+      const MAX_RECENT_MOVIES = 20; // 최대 20개만 유지 (필요에 따라 조절)
+      if (updatedRecent.length > MAX_RECENT_MOVIES) {
+          updatedRecent = updatedRecent.slice(0, MAX_RECENT_MOVIES);
+      }
+      localStorage.setItem('recentMovies', JSON.stringify(updatedRecent));
+    }
+  }, [selectedMovieId]);
+
+  // 상세 페이지에서 목록으로 돌아가기
   const handleBackToList = () => {
     setSelectedMovieId(null); // 상세 보기 해제
-    // 이전에 어떤 뷰였는지에 따라 해당 뷰의 상태를 유지하거나 기본 뷰로 돌아감
-    if (currentView === 'home') {
-      fetchMovies(); // 홈으로 돌아가서 인기 영화를 다시 로드
-    }
-    // favorites나 recent 뷰에서 돌아왔다면 해당 뷰를 유지 (추가 로직 필요 없음)
+    // currentView는 이미 설정되어 있으므로 별도의 setCurrentView 호출 필요 없음
   };
 
   // MovieFilter에서 필터 적용 시 호출될 함수
@@ -127,7 +126,7 @@ function App() {
         <h1>TMDB Insight</h1>
         <SearchBar onSearch={handleSearch} />
         <nav className="main-nav">
-          <button onClick={() => { setCurrentView('home'); setSelectedMovieId(null); fetchMovies(); }}>홈</button>
+          <button onClick={() => { setCurrentView('home'); setSelectedMovieId(null); }}>홈</button>
           <button onClick={() => { setCurrentView('favorites'); setSelectedMovieId(null); }}>찜 목록</button>
           <button onClick={() => { setCurrentView('recent'); setSelectedMovieId(null); }}>최근 본 영화</button>
         </nav>
@@ -151,13 +150,19 @@ function App() {
                     <MovieCard key={movie.id} movie={movie} onClick={() => handleMovieClick(movie.id)} />
                   ))
                 ) : (
-                  !loading && !error && <p>검색 결과 또는 필터링된 영화가 없습니다.</p>
+                  !loading && !error && <p className="no-items">검색 결과 또는 필터링된 영화가 없습니다.</p>
                 )}
               </div>
             </>
           )}
-          {currentView === 'favorites' && <FavoriteMovies fetchApi={fetchApi} />}
-          {currentView === 'recent' && <RecentMovies fetchApi={fetchApi} />}
+          {currentView === 'favorites' && (
+            // FavoriteMovies에 onMovieClick prop 전달
+            <FavoriteMovies fetchApi={fetchApi} onMovieClick={handleMovieClick} />
+          )}
+          {currentView === 'recent' && (
+            // RecentMovies에 onMovieClick prop 전달
+            <RecentMovies fetchApi={fetchApi} onMovieClick={handleMovieClick} />
+          )}
         </>
       )}
     </div>

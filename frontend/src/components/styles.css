@@ -14,13 +14,23 @@
     --card-background: #ffffff; /* 카드 배경 */
     --border-color: #e0e0e0; /* 경계선 색상 */
     --shadow-color: rgba(0, 0, 0, 0.1); /* 그림자 색상 */
+    --spacing-xs: 4px;   /* 아주 작은 간격 추가 */
     --spacing-small: 8px;
     --spacing-medium: 16px;
     --spacing-large: 24px;
+    --spacing-xl: 32px;  /* 큰 간격 추가 */
+}
+
+/* 기본 요소들의 마진/패딩 초기화 및 전체 화면 사용 설정 */
+html, body, #root {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh; /* 뷰포트 높이 100% 사용 */
+    box-sizing: border-box; /* 패딩과 보더가 너비/높이에 포함되도록 */
 }
 
 body {
-    margin: 0;
     font-family: 'Arial', sans-serif;
     background-color: var(--background-color);
     color: var(--text-color-dark);
@@ -29,25 +39,32 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* App 전체 컨테이너: 최대 너비 확장 및 중앙 정렬 */
 .app-container {
-    max-width: 1200px;
+    /* 기본적으로 넓게 설정하고, 반응형에서 조절 */
+    max-width: 1920px; /* 데스크톱에서 기본 최대 너비를 훨씬 넓게 */
     margin: 0 auto;
-    padding: var(--spacing-medium);
+    padding: var(--spacing-medium); /* 양옆 패딩을 유지하되, 필요시 조절 */
     box-sizing: border-box;
+    display: flex; /* flexbox를 사용하여 내부 요소들을 세로로 정렬 */
+    flex-direction: column;
+    min-height: 100vh; /* 앱 컨테이너도 뷰포트 높이 100% 사용 */
 }
 
 /* 헤더 스타일 */
 .app-header {
     background-color: var(--primary-color);
     color: var(--text-color-light);
-    padding: var(--spacing-medium) var(--spacing-large);
-    border-radius: 8px;
+    /* 양옆 패딩을 줄이거나 없애서 꽉 차게 */
+    padding: var(--spacing-medium) var(--spacing-xl); /* 좌우 패딩을 더 넓게 */
+    border-radius: 8px; /* App Container의 라운드 코너를 살리려면 이 부분 조정 필요 */
     margin-bottom: var(--spacing-large);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--spacing-medium);
     box-shadow: 0 4px 8px var(--shadow-color);
+    flex-shrink: 0; /* 내용이 많아도 헤더 크기가 줄어들지 않도록 */
 }
 
 .app-header h1 {
@@ -61,7 +78,7 @@ body {
 .search-bar {
     display: flex;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px; /* 검색 바 최대 너비 늘림 */
     box-shadow: 0 2px 4px var(--shadow-color);
     border-radius: 25px;
     overflow: hidden;
@@ -137,9 +154,11 @@ body {
 /* 영화 카드 그리드 */
 .movie-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: var(--spacing-large);
-    padding: var(--spacing-medium) 0;
+    /* 큰 화면에서 더 많은 열을 보여주도록 minmax 값 및 열 개수 조정 */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 더 큰 카드 너비 허용 */
+    gap: var(--spacing-large); /* 카드 간 간격 유지 */
+    padding: var(--spacing-medium) 0; /* 그리드 자체의 좌우 패딩 제거 */
+    flex-grow: 1; /* 남은 세로 공간을 차지하도록 */
 }
 
 /* 영화 카드 */
@@ -161,27 +180,56 @@ body {
 }
 
 .movie-card-wrapper {
-    position: relative; /* 찜 해제 버튼 위치 조정을 위해 */
+    position: relative;
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
-.movie-card-wrapper .favorite-button {
+/* 영화 상세 페이지에서 찜하기 버튼 */
+.movie-detail .favorite-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+    align-self: flex-start; /* 좌측 정렬 */
+    margin-bottom: var(--spacing-medium); /* 아래 여백 추가 */
+}
+
+.movie-detail .favorite-button:hover {
+    background-color: #e0e0e0;
+}
+
+.movie-detail .favorite-button.favorited {
+    background-color: var(--secondary-color); /* 찜된 상태의 배경색 */
+    color: var(--text-color-light);
+    border-color: var(--secondary-color);
+}
+
+.movie-detail .favorite-button.favorited:hover {
+    background-color: var(--secondary-dark);
+}
+
+/* 찜 목록/최근 본 영화 카드 래퍼 내 찜 해제 버튼 */
+.movie-card-wrapper .favorite-button.remove-favorite {
     background-color: var(--secondary-color); /* 찜 해제 버튼 색상 */
     color: var(--text-color-light);
     border: none;
-    padding: var(--spacing-small) var(--spacing-medium);
+    padding: var(--spacing-small); /* 패딩 조정 */
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9em;
-    margin-top: var(--spacing-small);
-    width: fit-content; /* 내용물에 따라 너비 조정 */
-    align-self: center; /* 가운데 정렬 */
+    margin: var(--spacing-small) auto var(--spacing-small) auto; /* 상하 마진 추가, 좌우 자동 */
+    width: calc(100% - (var(--spacing-small) * 2)); /* 카드 내부 패딩 고려 */
+    text-align: center;
     transition: background-color 0.3s ease;
 }
 
-.movie-card-wrapper .favorite-button:hover {
+.movie-card-wrapper .favorite-button.remove-favorite:hover {
     background-color: var(--secondary-dark);
 }
 
@@ -189,23 +237,28 @@ body {
 .movie-poster {
     width: 100%;
     height: 270px; /* 고정된 이미지 높이 */
-    object-fit: cover; /* 이미지가 잘리지 않고 채워지도록 */
+    object-fit: cover;
     border-bottom: 1px solid var(--border-color);
 }
 
 .movie-info {
     padding: var(--spacing-small);
-    flex-grow: 1; /* 남은 공간을 차지하여 내용이 길어져도 카드 크기 유지 */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* 제목과 평점 사이 간격 조정 */
+    justify-content: space-between;
 }
 
 .movie-info h3 {
     font-size: 1.1em;
     margin: 0 0 5px 0;
     line-height: 1.3;
-    min-height: 2.6em; /* 두 줄까지 표시될 공간 확보 */
+    min-height: 2.6em;
+    overflow: hidden; /* 텍스트 오버플로우 숨김 */
+    text-overflow: ellipsis; /* ... 표시 */
+    display: -webkit-box; /* 웹킷 기반 브라우저에서 여러 줄 자르기 */
+    -webkit-line-clamp: 2; /* 2줄까지 표시 */
+    -webkit-box-orient: vertical;
 }
 
 .movie-info p {
@@ -220,22 +273,33 @@ body {
 .movie-detail {
     background-color: var(--card-background);
     border-radius: 8px;
-    padding: var(--spacing-large);
-    margin-bottom: var(--spacing-large);
+    /* 전체 패딩을 줄이고, 컨테이너 max-width를 따르도록 */
+    padding: var(--spacing-xl); /* 내부 패딩을 넉넉하게 */
+    /* margin-bottom은 App Container에서 관리하므로 제거 */
     box-shadow: 0 4px 8px var(--shadow-color);
+    flex-grow: 1; /* 남은 공간을 차지하도록 */
+    display: flex;
+    flex-direction: column;
 }
 
 .detail-backdrop {
     width: 100%;
-    max-height: 400px;
+    max-height: 500px; /* 배경 이미지 높이 증가 */
     object-fit: cover;
     border-radius: 8px;
     margin-bottom: var(--spacing-medium);
     box-shadow: 0 2px 4px var(--shadow-color);
 }
 
+/* 영화 상세 정보 내용 컨테이너 */
+.detail-content {
+    /* MovieDetail 내부에서 실제 텍스트가 시작되는 부분 */
+    padding: 0; /* MovieDetail 자체에 패딩이 있으므로 여기는 0 */
+}
+
+
 .movie-detail h2 {
-    font-size: 2em;
+    font-size: 2.5em; /* 제목 크기 키움 */
     color: var(--primary-dark);
     margin-top: 0;
     margin-bottom: var(--spacing-small);
@@ -251,19 +315,19 @@ body {
 }
 
 .trailer-container {
-    margin-top: var(--spacing-large);
+    margin-top: var(--spacing-xl); /* 트레일러 위 간격 늘림 */
     text-align: center;
 }
 
 .trailer-container h3 {
-    font-size: 1.5em;
+    font-size: 1.8em; /* 트레일러 제목 크기 키움 */
     color: var(--primary-dark);
     margin-bottom: var(--spacing-medium);
 }
 
 .trailer-container iframe {
     width: 100%;
-    max-width: 800px; /* 트레일러 최대 너비 */
+    max-width: 1200px; /* 트레일러 최대 너비 확장 */
     aspect-ratio: 16 / 9; /* 16:9 비율 유지 */
     border-radius: 8px;
     box-shadow: 0 4px 8px var(--shadow-color);
@@ -290,17 +354,17 @@ body {
 .movie-filter {
     background-color: var(--card-background);
     border-radius: 8px;
-    padding: var(--spacing-medium);
+    padding: var(--spacing-large); /* 필터 패딩 늘림 */
     margin-bottom: var(--spacing-large);
     box-shadow: 0 2px 4px var(--shadow-color);
     display: flex;
-    flex-wrap: wrap; /* 작은 화면에서 줄바꿈 */
+    flex-wrap: wrap;
     gap: var(--spacing-medium);
-    align-items: flex-end; /* 필터 적용 버튼과 입력 필드 정렬 */
+    align-items: flex-end;
 }
 
 .movie-filter h3 {
-    width: 100%; /* 제목은 항상 한 줄 */
+    width: 100%;
     margin-top: 0;
     margin-bottom: var(--spacing-small);
     color: var(--primary-dark);
@@ -310,8 +374,8 @@ body {
 .filter-group {
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto; /* 유연하게 공간 차지 */
-    min-width: 150px; /* 최소 너비 */
+    flex: 1 1 auto;
+    min-width: 180px; /* 최소 너비 약간 증가 */
 }
 
 .filter-group label {
@@ -344,8 +408,8 @@ body {
     cursor: pointer;
     font-size: 1em;
     transition: background-color 0.3s ease;
-    align-self: flex-end; /* 필터 적용 버튼을 아래로 정렬 */
-    height: fit-content; /* 높이를 내용물에 맞춤 */
+    align-self: flex-end;
+    height: fit-content;
 }
 
 .movie-filter button:hover {
@@ -361,6 +425,7 @@ body {
     padding: var(--spacing-large);
     margin-bottom: var(--spacing-large);
     box-shadow: 0 4px 8px var(--shadow-color);
+    flex-grow: 1; /* 남은 세로 공간을 차지하도록 */
 }
 
 .favorites-section h2,
@@ -374,42 +439,84 @@ body {
 
 .favorites-section .no-items,
 .recent-section .no-items {
-    background-color: transparent; /* 섹션 내 메시지 배경 제거 */
-    box-shadow: none; /* 섹션 내 메시지 그림자 제거 */
+    background-color: transparent;
+    box-shadow: none;
     color: #666;
 }
 
+/* 추가적인 찜하기 버튼 스타일 (MovieDetail에 사용) */
+.favorite-button { /* 찜하기 버튼의 기본 스타일 - MovieDetail에 적용된 클래스 */
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.favorite-button:hover {
+    background-color: #e0e0e0;
+}
+
+.favorite-button.favorited {
+    background-color: var(--secondary-color); /* 찜된 상태의 배경색을 변수로 */
+    color: var(--text-color-light);
+    border-color: var(--secondary-color);
+}
+
+.favorite-button.favorited:hover {
+    background-color: var(--secondary-dark);
+}
+
+
 /* 반응형 디자인 */
 
-.app-container {
-    max-width: 1200px; /* 기본값 유지 (작은 데스크톱까지) */
-    margin: 0 auto;
-    padding: var(--spacing-medium);
-    box-sizing: border-box;
-}
+/* 1200px 이하: 기존 레이아웃 유지 (max-width: 1200px) */
 
-/* 추가: 대형 데스크톱 화면 최적화 */
-@media (min-width: 1201px) { /* 1201px 이상 화면 */
+/* 1201px 이상: app-container의 max-width를 늘려서 넓은 화면 사용 */
+@media (min-width: 1201px) {
     .app-container {
-        max-width: 1600px; /* 1600px로 확장 */
+        max-width: 1600px; /* 더 넓게 */
     }
-    /* 필요하다면 이 크기에서 다른 요소들도 조절할 수 있습니다. */
-    /* 예: .movie-grid { gap: 32px; } */
-}
-
-@media (min-width: 1921px) { /* 1921px 이상 (QHD, 4K 등) */
-    .app-container {
-        max-width: 2200px; /* 또는 2000px 등 더 넓게 */
-    }
-    /* 이보다 더 큰 화면에서는 가독성을 위해 max-width를 너무 늘리지 않는 것이 좋습니다. */
-    /* 또는 더 많은 열을 추가할 수 있습니다. */
     .movie-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 카드를 더 크게 */
-        gap: var(--spacing-large);
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 카드 크기 약간 키움 */
+        gap: var(--spacing-xl); /* 간격 늘림 */
+    }
+    .movie-poster {
+        height: 300px; /* 포스터 높이 조절 */
+    }
+    .movie-detail h2 {
+        font-size: 2.8em; /* 상세 페이지 제목 더 크게 */
+    }
+    .movie-detail p {
+        font-size: 1.15em; /* 상세 페이지 텍스트 크기 조절 */
     }
 }
 
+/* 1601px 이상 (QHD 이상 모니터) */
+@media (min-width: 1601px) {
+    .app-container {
+        max-width: 2200px; /* 4K 모니터 등에서 더 넓게 */
+    }
+    .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 더 큰 카드 너비 */
+        gap: var(--spacing-xl);
+    }
+    .movie-poster {
+        height: 350px;
+    }
+    .trailer-container iframe {
+        max-width: 1400px; /* 트레일러 더 크게 */
+    }
+}
+
+/* 768px 이하 (태블릿 및 작은 데스크톱) */
 @media (max-width: 768px) {
+    .app-container {
+        padding: var(--spacing-medium);
+    }
     .app-header {
         padding: var(--spacing-medium);
     }
@@ -436,6 +543,8 @@ body {
     }
     .trailer-container iframe {
         max-width: 100%;
+        height: auto;
+        min-height: 200px; /* 최소 높이 설정 */
     }
     .movie-filter {
         flex-direction: column;
@@ -451,6 +560,7 @@ body {
     }
 }
 
+/* 480px 이하 (모바일) */
 @media (max-width: 480px) {
     .app-container {
         padding: var(--spacing-small);
@@ -471,11 +581,11 @@ body {
         font-size: 0.9em;
     }
     .movie-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: 1fr; /* 모바일에서는 한 줄에 하나씩 */
         gap: var(--spacing-small);
     }
     .movie-poster {
-        height: 180px;
+        height: 200px;
     }
     .movie-info h3 {
         font-size: 1em;
