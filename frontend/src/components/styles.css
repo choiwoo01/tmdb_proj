@@ -1,288 +1,497 @@
 /* frontend/src/components/styles.css */
 
+/* 기본 설정 */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    --primary-color: #3f51b5; /* 진한 파랑 */
+    --primary-light: #757de8; /* 밝은 파랑 */
+    --primary-dark: #002984; /* 어두운 파랑 */
+    --secondary-color: #f44336; /* 빨강 */
+    --secondary-light: #ff7961; /* 밝은 빨강 */
+    --secondary-dark: #ba000d; /* 어두운 빨강 */
+    --text-color-dark: #212121; /* 어두운 텍스트 */
+    --text-color-light: #ffffff; /* 밝은 텍스트 */
+    --background-color: #f0f2f5; /* 밝은 회색 배경 */
+    --card-background: #ffffff; /* 카드 배경 */
+    --border-color: #e0e0e0; /* 경계선 색상 */
+    --shadow-color: rgba(0, 0, 0, 0.1); /* 그림자 색상 */
+    --spacing-small: 8px;
+    --spacing-medium: 16px;
+    --spacing-large: 24px;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-  width: 100%;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color-dark);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .app-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-medium);
+    box-sizing: border-box;
 }
 
+/* 헤더 스타일 */
 .app-header {
-  width: 100%;
-  padding: 20px 0;
-  background-color: #1a1a1a;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  margin-bottom: 20px;
-  text-align: center;
+    background-color: var(--primary-color);
+    color: var(--text-color-light);
+    padding: var(--spacing-medium) var(--spacing-large);
+    border-radius: 8px;
+    margin-bottom: var(--spacing-large);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-medium);
+    box-shadow: 0 4px 8px var(--shadow-color);
 }
 
 .app-header h1 {
-  color: #007bff;
-  margin-bottom: 15px;
+    margin: 0;
+    font-size: 2.5em;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px var(--shadow-color);
 }
 
-/* Search Bar */
+/* 검색 바 */
 .search-bar {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+    display: flex;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    border-radius: 25px;
+    overflow: hidden;
 }
 
 .search-bar input {
-  flex-grow: 1;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #333;
-  background-color: #222;
-  color: #eee;
-  font-size: 1em;
+    flex-grow: 1;
+    padding: var(--spacing-small) var(--spacing-medium);
+    border: none;
+    outline: none;
+    font-size: 1em;
+    background-color: var(--card-background);
+    color: var(--text-color-dark);
 }
 
 .search-bar button {
-  padding: 10px 15px;
-  border-radius: 5px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  font-size: 1em;
-  transition: background-color 0.2s;
+    background-color: var(--secondary-color);
+    color: var(--text-color-light);
+    border: none;
+    padding: var(--spacing-small) var(--spacing-medium);
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
 }
 
 .search-bar button:hover {
-  background-color: #0056b3;
+    background-color: var(--secondary-dark);
 }
 
-/* Messages */
-.loading-message, .error-message {
-  padding: 15px;
-  border-radius: 8px;
-  margin-top: 20px;
-  width: 100%;
-  max-width: 600px;
-  text-align: center;
+/* 메인 네비게이션 */
+.main-nav {
+    display: flex;
+    gap: var(--spacing-medium);
+    margin-top: var(--spacing-medium);
 }
 
-.loading-message {
-  background-color: #333;
-  color: #fff;
+.main-nav button {
+    background-color: var(--primary-light);
+    color: var(--text-color-light);
+    border: none;
+    padding: var(--spacing-small) var(--spacing-medium);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.main-nav button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* 로딩/에러 메시지 */
+.loading-message,
+.error-message,
+.no-items {
+    text-align: center;
+    padding: var(--spacing-large);
+    font-size: 1.2em;
+    color: var(--text-color-dark);
+    background-color: var(--card-background);
+    border-radius: 8px;
+    margin-bottom: var(--spacing-large);
+    box-shadow: 0 2px 4px var(--shadow-color);
 }
 
 .error-message {
-  background-color: #dc3545;
-  color: white;
+    color: var(--secondary-dark);
+    font-weight: bold;
 }
 
-/* Movie Grid */
+/* 영화 카드 그리드 */
 .movie-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
-  padding: 20px 0;
-  width: 100%;
-  max-width: 1200px; /* 그리드 최대 너비 */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--spacing-large);
+    padding: var(--spacing-medium) 0;
 }
 
-/* Movie Card */
+/* 영화 카드 */
 .movie-card {
-  background-color: #1a1a1a;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
-  display: flex;
-  flex-direction: column;
-  height: 100%; /* 카드 높이 고정 */
+    background-color: var(--card-background);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* 부모 그리드의 높이에 맞춤 */
 }
 
 .movie-card:hover {
-  transform: translateY(-5px);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px var(--shadow-color);
 }
 
-.movie-card img {
-  width: 100%;
-  height: 270px; /* 이미지 높이 고정 */
-  object-fit: cover;
-  display: block;
+.movie-card-wrapper {
+    position: relative; /* 찜 해제 버튼 위치 조정을 위해 */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
-.movie-card .movie-info {
-  padding: 15px;
-  flex-grow: 1; /* 정보 부분이 남은 공간을 채우도록 */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* 내용 균등 분배 */
+.movie-card-wrapper .favorite-button {
+    background-color: var(--secondary-color); /* 찜 해제 버튼 색상 */
+    color: var(--text-color-light);
+    border: none;
+    padding: var(--spacing-small) var(--spacing-medium);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: var(--spacing-small);
+    width: fit-content; /* 내용물에 따라 너비 조정 */
+    align-self: center; /* 가운데 정렬 */
+    transition: background-color 0.3s ease;
 }
 
-.movie-card h3 {
-  font-size: 1.1em;
-  margin-top: 0;
-  margin-bottom: 10px;
-  color: #007bff;
-  min-height: 2.2em; /* 두 줄까지 표시될 공간 확보 */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* 텍스트를 2줄로 제한 */
-  -webkit-box-orient: vertical;
+.movie-card-wrapper .favorite-button:hover {
+    background-color: var(--secondary-dark);
 }
 
-.movie-card p {
-  font-size: 0.9em;
-  color: #bbb;
-  margin-bottom: 5px;
+
+.movie-poster {
+    width: 100%;
+    height: 270px; /* 고정된 이미지 높이 */
+    object-fit: cover; /* 이미지가 잘리지 않고 채워지도록 */
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* Movie Detail */
+.movie-info {
+    padding: var(--spacing-small);
+    flex-grow: 1; /* 남은 공간을 차지하여 내용이 길어져도 카드 크기 유지 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 제목과 평점 사이 간격 조정 */
+}
+
+.movie-info h3 {
+    font-size: 1.1em;
+    margin: 0 0 5px 0;
+    line-height: 1.3;
+    min-height: 2.6em; /* 두 줄까지 표시될 공간 확보 */
+}
+
+.movie-info p {
+    font-size: 0.9em;
+    color: #555;
+    margin: 0;
+    font-weight: bold;
+}
+
+
+/* 영화 상세 정보 */
 .movie-detail {
-  background-color: #1a1a1a;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  padding: 20px;
-  width: 100%;
-  max-width: 900px;
-  text-align: left;
-  position: relative;
+    background-color: var(--card-background);
+    border-radius: 8px;
+    padding: var(--spacing-large);
+    margin-bottom: var(--spacing-large);
+    box-shadow: 0 4px 8px var(--shadow-color);
 }
 
-.movie-detail .back-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-bottom: 20px;
-  font-size: 1em;
-  transition: background-color 0.2s;
-}
-
-.movie-detail .back-button:hover {
-  background-color: #0056b3;
-}
-
-.movie-detail .detail-backdrop {
-  width: 100%;
-  height: 300px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.movie-detail .detail-content {
-  padding: 0 10px;
+.detail-backdrop {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: var(--spacing-medium);
+    box-shadow: 0 2px 4px var(--shadow-color);
 }
 
 .movie-detail h2 {
-  color: #007bff;
-  font-size: 2em;
-  margin-bottom: 10px;
+    font-size: 2em;
+    color: var(--primary-dark);
+    margin-top: 0;
+    margin-bottom: var(--spacing-small);
 }
 
 .movie-detail p {
-  margin-bottom: 8px;
-  line-height: 1.6;
+    margin-bottom: 5px;
+    font-size: 1.05em;
 }
 
-.movie-detail strong {
-  color: #eee;
+.movie-detail p strong {
+    color: var(--primary-color);
 }
 
 .trailer-container {
-  margin-top: 30px;
-  text-align: center;
+    margin-top: var(--spacing-large);
+    text-align: center;
 }
 
 .trailer-container h3 {
-  color: #eee;
-  margin-bottom: 15px;
+    font-size: 1.5em;
+    color: var(--primary-dark);
+    margin-bottom: var(--spacing-medium);
 }
 
 .trailer-container iframe {
-  width: 100%;
-  max-width: 700px;
-  height: 400px; /* 필요에 따라 조정 */
-  border-radius: 8px;
+    width: 100%;
+    max-width: 800px; /* 트레일러 최대 너비 */
+    aspect-ratio: 16 / 9; /* 16:9 비율 유지 */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.back-button {
+    background-color: var(--primary-color);
+    color: var(--text-color-light);
+    border: none;
+    padding: var(--spacing-small) var(--spacing-medium);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-bottom: var(--spacing-medium);
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.back-button:hover {
+    background-color: var(--primary-dark);
+}
+
+/* 영화 필터 */
+.movie-filter {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    padding: var(--spacing-medium);
+    margin-bottom: var(--spacing-large);
+    box-shadow: 0 2px 4px var(--shadow-color);
+    display: flex;
+    flex-wrap: wrap; /* 작은 화면에서 줄바꿈 */
+    gap: var(--spacing-medium);
+    align-items: flex-end; /* 필터 적용 버튼과 입력 필드 정렬 */
+}
+
+.movie-filter h3 {
+    width: 100%; /* 제목은 항상 한 줄 */
+    margin-top: 0;
+    margin-bottom: var(--spacing-small);
+    color: var(--primary-dark);
+    font-size: 1.3em;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto; /* 유연하게 공간 차지 */
+    min-width: 150px; /* 최소 너비 */
+}
+
+.filter-group label {
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: bold;
+}
+
+.movie-filter select,
+.movie-filter input[type="number"] {
+    padding: var(--spacing-small);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1em;
+    background-color: var(--background-color);
+    color: var(--text-color-dark);
+}
+
+.movie-filter input[type="number"]::placeholder {
+    color: #9e9e9e;
+}
+
+.movie-filter button {
+    background-color: var(--primary-color);
+    color: var(--text-color-light);
+    border: none;
+    padding: var(--spacing-small) var(--spacing-medium);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+    align-self: flex-end; /* 필터 적용 버튼을 아래로 정렬 */
+    height: fit-content; /* 높이를 내용물에 맞춤 */
+}
+
+.movie-filter button:hover {
+    background-color: var(--primary-dark);
+}
+
+
+/* 찜 목록 / 최근 본 영화 섹션 */
+.favorites-section,
+.recent-section {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    padding: var(--spacing-large);
+    margin-bottom: var(--spacing-large);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.favorites-section h2,
+.recent-section h2 {
+    font-size: 1.8em;
+    color: var(--primary-dark);
+    margin-top: 0;
+    margin-bottom: var(--spacing-medium);
+    text-align: center;
+}
+
+.favorites-section .no-items,
+.recent-section .no-items {
+    background-color: transparent; /* 섹션 내 메시지 배경 제거 */
+    box-shadow: none; /* 섹션 내 메시지 그림자 제거 */
+    color: #666;
 }
 
 /* 반응형 디자인 */
+
+.app-container {
+    max-width: 1200px; /* 기본값 유지 (작은 데스크톱까지) */
+    margin: 0 auto;
+    padding: var(--spacing-medium);
+    box-sizing: border-box;
+}
+
+/* 추가: 대형 데스크톱 화면 최적화 */
+@media (min-width: 1201px) { /* 1201px 이상 화면 */
+    .app-container {
+        max-width: 1600px; /* 1600px로 확장 */
+    }
+    /* 필요하다면 이 크기에서 다른 요소들도 조절할 수 있습니다. */
+    /* 예: .movie-grid { gap: 32px; } */
+}
+
+@media (min-width: 1921px) { /* 1921px 이상 (QHD, 4K 등) */
+    .app-container {
+        max-width: 2200px; /* 또는 2000px 등 더 넓게 */
+    }
+    /* 이보다 더 큰 화면에서는 가독성을 위해 max-width를 너무 늘리지 않는 것이 좋습니다. */
+    /* 또는 더 많은 열을 추가할 수 있습니다. */
+    .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 카드를 더 크게 */
+        gap: var(--spacing-large);
+    }
+}
+
 @media (max-width: 768px) {
-  .app-header h1 {
-    font-size: 1.8em;
-  }
-  .search-bar {
-    flex-direction: column;
-    gap: 15px;
-  }
-  .movie-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-  .movie-card img {
-    height: 225px;
-  }
-  .movie-detail .detail-backdrop {
-    height: 200px;
-  }
-  .movie-detail .trailer-container iframe {
-    height: 250px;
-  }
+    .app-header {
+        padding: var(--spacing-medium);
+    }
+    .app-header h1 {
+        font-size: 2em;
+    }
+    .main-nav {
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-small);
+    }
+    .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: var(--spacing-medium);
+    }
+    .movie-poster {
+        height: 220px;
+    }
+    .movie-detail {
+        padding: var(--spacing-medium);
+    }
+    .movie-detail h2 {
+        font-size: 1.8em;
+    }
+    .trailer-container iframe {
+        max-width: 100%;
+    }
+    .movie-filter {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-group {
+        width: 100%;
+        min-width: unset;
+    }
+    .movie-filter button {
+        width: 100%;
+        align-self: stretch;
+    }
 }
 
 @media (max-width: 480px) {
-  .app-header h1 {
-    font-size: 1.5em;
-  }
-  .movie-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 15px;
-  }
-  .movie-card img {
-    height: 180px;
-  }
-  .movie-card h3 {
-    font-size: 0.9em;
-  }
-  .movie-card p {
-    font-size: 0.75em;
-  }
-  .movie-detail {
-    padding: 15px;
-  }
-  .movie-detail h2 {
-    font-size: 1.5em;
-  }
+    .app-container {
+        padding: var(--spacing-small);
+    }
+    .app-header {
+        padding: var(--spacing-small);
+    }
+    .app-header h1 {
+        font-size: 1.5em;
+    }
+    .search-bar input,
+    .search-bar button {
+        padding: var(--spacing-small);
+        font-size: 0.9em;
+    }
+    .main-nav button {
+        padding: var(--spacing-small);
+        font-size: 0.9em;
+    }
+    .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: var(--spacing-small);
+    }
+    .movie-poster {
+        height: 180px;
+    }
+    .movie-info h3 {
+        font-size: 1em;
+        min-height: 2.2em;
+    }
+    .movie-info p {
+        font-size: 0.8em;
+    }
+    .movie-detail h2 {
+        font-size: 1.5em;
+    }
+    .movie-detail p,
+    .movie-detail p strong {
+        font-size: 0.9em;
+    }
+    .trailer-container h3 {
+        font-size: 1.2em;
+    }
 }
