@@ -14,7 +14,7 @@ function App() {
   const [selectedMovieId, setSelectedMovieId] = useState(null);
 
   // 로컬 개발 시에는 '/api', 배포 시에는 Nginx 프록시를 통해 같은 도메인으로
-  const API_BASE_PATH = '/api';
+  const API_BASE_PATH = 'https://backend-api-eta-jet.vercel.app/api';
 
   // 인기 영화 불러오기
   useEffect(() => {
