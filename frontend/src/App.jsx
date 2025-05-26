@@ -16,6 +16,7 @@ function App() {
   const [selectedMovieId, setSelectedMovieId] = useState(null); // 영화 상세 페이지 표시 여부
   const [currentView, setCurrentView] = useState('home'); // 'home', 'favorites', 'recent'
   const [lastHomeFilter, setLastHomeFilter] = useState({}); // 홈 뷰의 마지막 필터 상태 저장
+  const [currentSearchQuery, setCurrentSearchQuery] = useState(''); // 현재 검색 쿼리 저장
 
   const API_BASE_PATH = '/api';
 
@@ -40,8 +41,8 @@ function App() {
     }
   }, [API_BASE_PATH]);
 
-  // 홈 뷰의 영화 목록을 불러오는 함수
-  const fetchMovies = useCallback(async (filterParams = {}) => {
+  // 홈 뷰의 영화 목록을 불러오는 함수 (필터링된 영화 또는 인기 영화)
+  const fetchHomeMovies = useCallback(async (filterParams = {}) => {
     setLoading(true);
     setError(null);
     try {
@@ -51,7 +52,7 @@ function App() {
       }).toString();
       const data = await fetchApi(`tmdb?${queryString}`);
       setMovies(data);
-      setLastHomeFilter(filterParams); // 마지막 필터 상태 저장
+      setLastHomeFilter(filterParams); // 마지막 필터 상태 저장 (검색 제외)
     } catch (err) {
       console.error("Error fetching movies:", err);
       setError(err.message);
@@ -60,25 +61,30 @@ function App() {
     }
   }, [fetchApi]);
 
-  // 초기 로드 시 인기 영화 불러오기 (home 뷰일 때만)
+  // 초기 로드 또는 홈 뷰로 전환 시 영화 불러오기
   useEffect(() => {
-    if (currentView === 'home' && !selectedMovieId) {
-      // home으로 돌아왔을 때, 이전에 적용된 필터로 다시 로드
-      fetchMovies(lastHomeFilter); 
+    // currentView가 'home'이고, 상세 영화가 선택되지 않았으며,
+    // 현재 검색 쿼리가 없을 때만 홈 뷰 영화 (인기 영화 또는 필터링된 영화)를 불러옵니다.
+    if (currentView === 'home' && !selectedMovieId && !currentSearchQuery) {
+      fetchHomeMovies(lastHomeFilter);
     }
-  }, [fetchMovies, currentView, selectedMovieId, lastHomeFilter]);
+  }, [fetchHomeMovies, currentView, selectedMovieId, lastHomeFilter, currentSearchQuery]);
+
 
   // 검색 처리
   const handleSearch = async (query) => {
     setCurrentView('home'); // 검색 시 홈 뷰로 전환
     setSelectedMovieId(null); // 상세 보기 해제
+    setCurrentSearchQuery(query); // 현재 검색 쿼리 저장
     setLoading(true);
     setError(null);
     try {
       const data = await fetchApi(`tmdb?type=search&query=${encodeURIComponent(query)}`);
       setMovies(data);
       localStorage.setItem('lastSearchQuery', query);
-      setLastHomeFilter({}); // 검색 시 필터 초기화
+      // 검색 시 lastHomeFilter는 유지하거나, 검색 결과에 따라 초기화하지 않습니다.
+      // 왜냐하면 검색은 discover 필터링과 별개로 작동하기 때문입니다.
+      // setLastHomeFilter({}); // 이 라인 제거 또는 주석 처리
     } catch (err) {
       console.error("Error searching movies:", err);
       setError(err.message);
@@ -110,14 +116,16 @@ function App() {
   // 상세 페이지에서 목록으로 돌아가기
   const handleBackToList = () => {
     setSelectedMovieId(null); // 상세 보기 해제
-    // currentView는 이미 설정되어 있으므로 별도의 setCurrentView 호출 필요 없음
+    // 'home' 뷰로 돌아갈 때, currentSearchQuery가 있다면 검색 결과를 유지하고,
+    // 없다면 (혹은 비어 있다면) fetchHomeMovies에 의해 인기 영화가 로드됩니다.
   };
 
   // MovieFilter에서 필터 적용 시 호출될 함수
   const handleApplyFilter = async (filterParams) => {
     setCurrentView('home'); // 필터 적용 시 홈 뷰로 전환
     setSelectedMovieId(null); // 상세 보기 해제
-    await fetchMovies(filterParams); // 필터 파라미터로 영화 불러오기
+    setCurrentSearchQuery(''); // 필터 적용 시 검색 쿼리 초기화 (검색 결과 대신 필터 결과 보여줌)
+    await fetchHomeMovies(filterParams); // 필터 파라미터로 영화 불러오기
   };
 
   return (
@@ -126,12 +134,13 @@ function App() {
         <h1>TMDB Insight</h1>
         <SearchBar onSearch={handleSearch} />
         <nav className="main-nav">
-          <button onClick={() => { setCurrentView('home'); setSelectedMovieId(null); }}>홈</button>
+          {/* 홈 버튼 클릭 시 검색 쿼리 초기화 및 홈 뷰로 이동 */}
+          <button onClick={() => { setCurrentView('home'); setSelectedMovieId(null); setCurrentSearchQuery(''); }}>홈</button>
           <button onClick={() => { setCurrentView('favorites'); setSelectedMovieId(null); }}>찜 목록</button>
           <button onClick={() => { setCurrentView('recent'); setSelectedMovieId(null); }}>최근 본 영화</button>
         </nav>
       </header>
-      
+
       {loading && <p className="loading-message">로딩 중...</p>}
       {error && <p className="error-message">오류: {error}</p>}
 
@@ -143,14 +152,27 @@ function App() {
         <>
           {currentView === 'home' && (
             <>
-              <MovieFilter onApplyFilter={handleApplyFilter} />
+              {/* 홈 뷰일 때만 MovieFilter 렌더링 */}
+              {/* 검색 쿼리와 관계없이 필터 컴포넌트 유지 */}
+              <MovieFilter onApplyFilter={handleApplyFilter} /> {/* !currentSearchQuery 조건 제거 */}
               <div className="movie-grid">
                 {movies.length > 0 ? (
                   movies.map(movie => (
                     <MovieCard key={movie.id} movie={movie} onClick={() => handleMovieClick(movie.id)} />
                   ))
                 ) : (
-                  !loading && !error && <p className="no-items">검색 결과 또는 필터링된 영화가 없습니다.</p>
+                  // 로딩 중이 아니고 에러도 없는데 영화가 없으면 메시지 표시
+                  !loading && !error && (
+                    <p className="no-items">
+                      {currentSearchQuery
+                        ? `"${currentSearchQuery}"에 대한 검색 결과가 없습니다.`
+                        : (Object.keys(lastHomeFilter).length > 0
+                           ? "선택된 필터에 해당하는 영화가 없습니다."
+                           : "표시할 영화가 없습니다."
+                          )
+                      }
+                    </p>
+                  )
                 )}
               </div>
             </>
